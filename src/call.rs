@@ -6,12 +6,12 @@ use http::{
 use http_body_util::BodyExt;
 use js_sys::{Array, Uint8Array};
 use tonic::body::Body;
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsCast as _, JsValue};
 use web_sys::{Headers, RequestCredentials, RequestInit};
 
-use crate::{fetch::fetch, options::FetchOptions, Error, ResponseBody};
+use crate::{body_stream::BodyStream, fetch::fetch, options::FetchOptions, Error, ResponseBody};
 
-pub async fn call(
+pub(crate) async fn call(
     mut base_url: String,
     request: Request<Body>,
     options: Option<FetchOptions>,
@@ -28,7 +28,11 @@ pub async fn call(
     let (result, content_type) = set_response_headers(result, &response)?;
 
     let content_type = content_type.ok_or(Error::MissingContentTypeHeader)?;
+
     let body_stream = response.body().ok_or(Error::MissingResponseBody)?;
+    let body_stream = BodyStream::new(
+        wasm_streams::ReadableStream::from_raw(body_stream.unchecked_into()).into_stream(),
+    );
 
     let body = ResponseBody::new(body_stream, &content_type)?;
 

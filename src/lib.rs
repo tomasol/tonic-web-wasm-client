@@ -44,13 +44,27 @@
 //! This library allows you to set a custom `Accept` header for the requests. This can be useful if you need to specify
 //! a different content type for the responses. But, be aware that if you set a custom `Accept` header, the client may
 //! not be able to handle the response correctly.
+
 mod body_stream;
+#[cfg(feature = "browser")]
 mod call;
 mod client;
 mod content_type;
 mod error;
+#[cfg(feature = "browser")]
 mod fetch;
+#[cfg(feature = "browser")]
 pub mod options;
+
 mod response_body;
 
-pub use self::{client::Client, error::Error, response_body::ResponseBody};
+#[cfg(feature = "wasip2")]
+mod cm;
+#[cfg(feature = "wasip2")]
+pub(crate) use self::cm::call;
+#[cfg(feature = "wasip2")]
+pub use self::cm::options;
+
+pub use self::response_body::ResponseBody;
+
+pub use self::{client::Client, error::Error};
