@@ -44,13 +44,36 @@
 //! This library allows you to set a custom `Accept` header for the requests. This can be useful if you need to specify
 //! a different content type for the responses. But, be aware that if you set a custom `Accept` header, the client may
 //! not be able to handle the response correctly.
+#[cfg(feature = "browser")]
 mod body_stream;
+#[cfg(feature = "browser")]
 mod call;
 mod client;
 mod content_type;
 mod error;
+#[cfg(feature = "browser")]
 mod fetch;
+#[cfg(feature = "browser")]
 pub mod options;
+#[cfg(feature = "browser")]
 mod response_body;
 
-pub use self::{client::Client, error::Error, response_body::ResponseBody};
+#[cfg(feature = "component-model")]
+mod cm;
+#[cfg(feature = "component-model")]
+pub(crate) use self::cm::call;
+
+#[cfg(feature = "component-model")]
+pub use self::cm::options;
+
+#[cfg(feature = "component-model")]
+pub type ResponseBody =
+    http_body_util::combinators::BoxBody<bytes::Bytes, std::convert::Infallible>;
+
+// #[cfg(feature = "component-model")]
+// pub use self::cm::response_body::ResponseBody;
+
+#[cfg(feature = "browser")]
+pub use self::response_body::ResponseBody;
+
+pub use self::{client::Client, error::Error};

@@ -11,7 +11,7 @@ use web_sys::{Headers, RequestCredentials, RequestInit};
 
 use crate::{fetch::fetch, options::FetchOptions, Error, ResponseBody};
 
-pub async fn call(
+pub(crate) async fn call(
     mut base_url: String,
     request: Request<Body>,
     options: Option<FetchOptions>,
