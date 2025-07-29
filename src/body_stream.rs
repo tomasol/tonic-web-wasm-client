@@ -4,10 +4,8 @@ use std::{
 };
 
 use bytes::Bytes;
-use futures_util::{stream::empty, Stream, TryStreamExt};
+use futures_util::{stream::empty, Stream};
 use http_body::{Body, Frame};
-use js_sys::Uint8Array;
-use wasm_streams::readable::IntoStream;
 
 use crate::Error;
 
@@ -16,10 +14,12 @@ pub struct BodyStream {
 }
 
 impl BodyStream {
-    pub fn new(body_stream: IntoStream<'static>) -> Self {
+    #[cfg(feature = "browser")]
+    pub fn new(body_stream: wasm_streams::readable::IntoStream<'static>) -> Self {
+        use futures_util::TryStreamExt as _;
         let body_stream = body_stream
             .map_ok(|js_value| {
-                let buffer = Uint8Array::new(&js_value);
+                let buffer = js_sys::Uint8Array::new(&js_value);
 
                 let mut bytes_vec = vec![0; buffer.length() as usize];
                 buffer.copy_to(&mut bytes_vec);
@@ -31,6 +31,11 @@ impl BodyStream {
         Self {
             body_stream: Box::pin(body_stream),
         }
+    }
+
+    #[cfg(feature = "wasip2")]
+    pub fn new(body_stream: Pin<Box<dyn Stream<Item = Result<Bytes, Error>>>>) -> Self {
+        Self { body_stream }
     }
 
     pub fn empty() -> Self {

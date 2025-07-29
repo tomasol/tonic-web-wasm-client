@@ -41,7 +41,7 @@ pub enum Error {
     /// gRPC error
     #[error("grpc error")]
     TonicStatusError(#[from] tonic::Status),
-    #[cfg(feature = "component-model")]
+    #[cfg(feature = "wasip2")]
     #[error(transparent)]
     WstdHttp(wstd::http::Error),
 }

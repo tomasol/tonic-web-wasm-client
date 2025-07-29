@@ -48,7 +48,7 @@ web-sys = { version = "0.3", features = [
 wstd = { version = "0.5", optional = true }
 
 [features]
-default = ["component-model"]
+default = ["browser"]
 
 # This feature enables dependencies required for running in a web browser
 # environment, utilizing Web APIs and JavaScript interop.
@@ -61,4 +61,4 @@ browser = [
 ]
 
 # This feature is intended for builds targeting the WebAssembly Component Model.
-component-model = ["dep:wstd"]
+wasip2 = ["dep:wstd"]
